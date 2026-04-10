@@ -5,8 +5,15 @@ from cl_forge import verify
 from streamlit import session_state as state
 
 
-def _increment_reset_counter():
-    state.calc_reset_counter = state.get("calc_reset_counter", 0) + 1
+if "calculate_reset_counter" not in state:
+    state.calculate_reset_counter: int = 0 # type: ignore
+
+
+def _increment_reset_counter() -> None:
+    state.calculate_reset_counter += 1
+
+def _get_calculate_input_key() -> str:
+    return f"calculate_rut_input_{state.calculate_reset_counter}"
 
 
 def calculate_digit():
@@ -15,13 +22,11 @@ def calculate_digit():
         vertical_alignment="center"
     )
 
-    input_key = f"calc_rut_input_{state.get('calc_reset_counter', 0)}"
-
     with col1:
         rut = st.text_input(
             label="Ingrese RUT",
             placeholder="Ej: 8750720",
-            key=input_key,
+            key=_get_calculate_input_key(),
         )
 
     with col2:
@@ -33,7 +38,11 @@ def calculate_digit():
             disabled=True,
         )
     
-    st.button("Reset", key="calc_reset", on_click=_increment_reset_counter)
+    st.button(
+        label="Reset",
+        key="calculate_reset",
+        on_click=_increment_reset_counter
+    )
 
     if rut and digit:
         st.code(f"{rut}-{digit}")
