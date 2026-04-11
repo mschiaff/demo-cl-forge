@@ -68,7 +68,7 @@ def validate_digit():
     with col1:
         rut_digit = st.text_input(
             label="Ingrese RUT",
-            placeholder="Ej: 8755183-0",
+            placeholder="Ej: 8750720-3",
             key=_get_validate_input_key(),
         )
     
@@ -87,7 +87,7 @@ def validate_digit():
             st.markdown(
                 """
                 <style>
-                    .stAlertContainer {
+                    .st-key-validate-result .stAlertContainer {
                         padding-top: 0.5rem;
                         padding-bottom: 0.5rem;
                     }
