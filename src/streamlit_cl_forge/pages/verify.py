@@ -62,7 +62,7 @@ def calculate_digit():
 def validate_digit():
     col1, col2 = st.columns(
         spec=2,
-        vertical_alignment="center"
+        vertical_alignment="bottom"
     )
 
     with col1:
@@ -83,12 +83,24 @@ def validate_digit():
                 digits=int(rut),
                 verifier=digit
             )
-
-            st.text_input(
-                label="Resultado",
-                value="Válido" if status else "Inválido",
-                disabled=True,
+            
+            st.markdown(
+                """
+                <style>
+                    .stAlertContainer {
+                        padding-top: 0.5rem;
+                        padding-bottom: 0.5rem;
+                    }
+                </style>
+                """,
+                unsafe_allow_html=True,
             )
+
+            with st.container(key="validate-result"):
+                if status:
+                    st.success("RUT válido")
+                else:
+                    st.error("RUT inválido")
 
     st.button(
         label="Reset",
