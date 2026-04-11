@@ -29,6 +29,9 @@ if "calculate_ppu_reset_counter" not in state:
 if "validate_ppu_reset_counter" not in state:
     state.validate_ppu_reset_counter: int = 0 # type: ignore
 
+if "validate_ppu_format_counter" not in state:
+    state.validate_ppu_format_counter: int = 0 # type: ignore
+
 if "is_ppu_validate_valid_format" not in state:
     state.is_ppu_validate_valid_format: bool = True # type: ignore
 
@@ -44,6 +47,12 @@ def _increment_validate_ppu_reset_counter() -> None:
 
 def _get_validate_ppu_input_key() -> str:
     return f"validate_ppu_input_{state.validate_ppu_reset_counter}"
+
+def _increment_validate_ppu_format_key() -> None:
+    state.validate_ppu_format_counter += 1
+
+def _get_validate_ppu_format_key() -> str:
+    return f"validate_ppu_format_{state.validate_ppu_format_counter}"
 
 
 def calculate_digit():
@@ -101,12 +110,15 @@ def validate_digit():
             label="Ingrese Patente",
             placeholder="Ej: PHZF55-3",
             key=_get_validate_ppu_input_key(),
+            on_change=_increment_validate_ppu_format_key,
         )
 
-        raw_ppu, raw_digit = (
-            ppu_digit.split("-")
-            if ppu_digit else (None, None)
-        )
+        if ppu_digit and "-" in ppu_digit:
+            raw_ppu, raw_digit = ppu_digit.split("-", 1)
+        elif ppu_digit:
+            raw_ppu, raw_digit = ppu_digit, None
+        else:
+            raw_ppu, raw_digit = None, None
 
         try:
             ppu: verify.Ppu | None = (
@@ -123,7 +135,7 @@ def validate_digit():
             label="Formato",
             value=ppu.format if ppu else "",
             disabled=True,
-            key="validate_ppu_format",
+            key=_get_validate_ppu_format_key(),
         )
     
     with col3, st.container(key="validate-result"):
@@ -154,3 +166,5 @@ calculate_digit()
 
 st.subheader("Validar dígito verificador")
 validate_digit()
+
+st.write(state)
