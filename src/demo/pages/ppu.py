@@ -166,5 +166,3 @@ calculate_digit()
 
 st.subheader("Validar dígito verificador")
 validate_digit()
-
-st.write(state)
