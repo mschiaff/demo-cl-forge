@@ -15,3 +15,14 @@ ipynb_checkpoints/
 
 # macOS files
 .DS_Store
+
+# Jupyter Notebook files
+.ipynb_checkpoints/
+*.ipynb
+
+# Cache files
+.ruff_cache/
+.pytest_cache/
+
+# Environment variables file
+.env

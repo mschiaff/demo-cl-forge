@@ -1,0 +1,125 @@
+from __future__ import annotations
+
+import streamlit as st
+from cl_forge import verify
+from streamlit import session_state as state
+
+st.set_page_config(
+    page_title="Cálculo y Validación de RUT",
+    page_icon="🔍"
+)
+
+st.markdown(
+    """
+    <style>
+        .st-key-validate-result .stAlertContainer {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+if "calculate_reset_counter" not in state:
+    state.calculate_reset_counter: int = 0 # type: ignore
+
+if "validate_reset_counter" not in state:
+    state.validate_reset_counter: int = 0 # type: ignore
+
+
+def _increment_calculate_reset_counter() -> None:
+    state.calculate_reset_counter += 1
+
+def _get_calculate_input_key() -> str:
+    return f"calculate_rut_input_{state.calculate_reset_counter}"
+
+def _increment_validate_reset_counter() -> None:
+    state.validate_reset_counter += 1
+
+def _get_validate_input_key() -> str:
+    return f"validate_rut_input_{state.validate_reset_counter}"
+
+
+def calculate_digit():
+    col1, col2 = st.columns(
+        spec=2,
+        vertical_alignment="center"
+    )
+
+    with col1:
+        rut = st.text_input(
+            label="Ingrese RUT",
+            placeholder="Ej: 8750720",
+            key=_get_calculate_input_key(),
+        )
+
+    with col2:
+        digit = st.text_input(
+            label="Dígito Verificador",
+            value=verify.calculate_verifier(
+                int(rut)
+            ) if rut else "",
+            disabled=True,
+        )
+
+    if rut and digit:
+        st.code(f"{rut}-{digit}")
+    
+    st.button(
+        label="Reset",
+        key="calculate_reset",
+        type="primary",
+        on_click=_increment_calculate_reset_counter,
+        use_container_width=True,
+    )
+
+
+def validate_digit():
+    col1, col2 = st.columns(
+        spec=2,
+        vertical_alignment="bottom"
+    )
+
+    with col1:
+        rut_digit = st.text_input(
+            label="Ingrese RUT",
+            placeholder="Ej: 8750720-3",
+            key=_get_validate_input_key(),
+        )
+    
+    with col2:
+        rut, digit = (
+            rut_digit.split("-")
+            if rut_digit else (None, None)
+        )
+        
+        if rut and digit:
+            status = verify.validate_rut(
+                digits=int(rut),
+                verifier=digit
+            )
+
+            with st.container(key="validate-result"):
+                if status:
+                    st.success("RUT válido")
+                else:
+                    st.error("RUT inválido")
+
+    st.button(
+        label="Reset",
+        key="validate_reset",
+        type="primary",
+        on_click=_increment_validate_reset_counter,
+        use_container_width=True,
+    )
+
+
+st.title("Cálculo y Validación de RUT")
+
+st.subheader("Calcular dígito verificador")
+calculate_digit()
+
+st.subheader("Validar dígito verificador")
+validate_digit()
