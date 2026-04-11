@@ -64,7 +64,7 @@ def calculate_digit():
     with col1:
         raw_ppu = st.text_input(
             label="Ingrese Patente",
-            placeholder="Ej: PHZF55",
+            placeholder="Ej: GXSX28",
             key=_get_calculate_ppu_input_key(),
         )
         
@@ -108,7 +108,7 @@ def validate_digit():
     with col1:
         ppu_digit = st.text_input(
             label="Ingrese Patente",
-            placeholder="Ej: PHZF55-3",
+            placeholder="Ej: GXSX28-1",
             key=_get_validate_ppu_input_key(),
             on_change=_increment_validate_ppu_format_key,
         )
