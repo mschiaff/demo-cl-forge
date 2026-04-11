@@ -5,6 +5,11 @@ from cl_forge import verify
 from streamlit import session_state as state
 
 
+st.set_page_config(
+    page_title="Cálculo y Validación de RUT",
+    page_icon="🔍"
+)
+
 st.markdown(
     """
     <style>
