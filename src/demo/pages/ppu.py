@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 from cl_forge import verify
+from cl_forge.exceptions import UnknownFormat
 from streamlit import session_state as state
 
 st.set_page_config(
@@ -28,6 +29,9 @@ if "calculate_ppu_reset_counter" not in state:
 if "validate_ppu_reset_counter" not in state:
     state.validate_ppu_reset_counter: int = 0 # type: ignore
 
+if "is_ppu_validate_valid_format" not in state:
+    state.is_ppu_validate_valid_format: bool = True # type: ignore
+
 
 def _increment_calculate_ppu_reset_counter() -> None:
     state.calculate_ppu_reset_counter += 1
@@ -43,8 +47,8 @@ def _get_validate_ppu_input_key() -> str:
 
 
 def calculate_digit():
-    col1, col2 = st.columns(
-        spec=2,
+    col1, col2, col3 = st.columns(
+        spec=3,
         vertical_alignment="center"
     )
 
@@ -66,6 +70,13 @@ def calculate_digit():
             value=ppu.verifier if ppu else "",
             disabled=True,
         )
+    
+    with col3:
+        st.text_input(
+            label="Formato",
+            value=ppu.format if ppu else "",
+            disabled=True,
+        )
 
     if ppu:
         st.code(f"{ppu.normalized}-{ppu.verifier}")
@@ -80,8 +91,8 @@ def calculate_digit():
 
 
 def validate_digit():
-    col1, col2 = st.columns(
-        spec=2,
+    col1, col2, col3 = st.columns(
+        spec=3,
         vertical_alignment="bottom"
     )
 
@@ -97,20 +108,35 @@ def validate_digit():
             if ppu_digit else (None, None)
         )
 
-        ppu: verify.Ppu | None = (
-            verify.Ppu(raw_ppu)
-            if raw_ppu else None
-        )
+        try:
+            ppu: verify.Ppu | None = (
+                verify.Ppu(raw_ppu)
+                if raw_ppu else None
+            )
+            state.is_ppu_validate_valid_format = True
+        except UnknownFormat:
+            ppu = None
+            state.is_ppu_validate_valid_format = False
     
     with col2:
+        st.text_input(
+            label="Formato",
+            value=ppu.format if ppu else "",
+            disabled=True,
+            key="validate_ppu_format",
+        )
+    
+    with col3, st.container(key="validate-result"):
         if ppu and isinstance(raw_digit, str):
             status = ppu.verifier == raw_digit.upper()
 
-            with st.container(key="validate-result"):
-                if status:
-                    st.success("Patente válida")
-                else:
-                    st.error("Patente inválida")
+            if status:
+                st.success("Patente válida")
+            else:
+                st.error("Patente inválida")
+        
+        if not ppu and not state.is_ppu_validate_valid_format:
+            st.error("Formato inválido")
 
     st.button(
         label="Reset",
