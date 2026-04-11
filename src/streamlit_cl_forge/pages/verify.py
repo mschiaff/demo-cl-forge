@@ -37,15 +37,17 @@ def calculate_digit():
             ) if rut else "",
             disabled=True,
         )
+
+    if rut and digit:
+        st.code(f"{rut}-{digit}")
     
     st.button(
         label="Reset",
         key="calculate_reset",
-        on_click=_increment_reset_counter
+        type="primary",
+        on_click=_increment_reset_counter,
+        use_container_width=True,
     )
-
-    if rut and digit:
-        st.code(f"{rut}-{digit}")
 
 
 def validate_digit():
