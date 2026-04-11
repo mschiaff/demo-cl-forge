@@ -5,6 +5,19 @@ from cl_forge import verify
 from streamlit import session_state as state
 
 
+st.markdown(
+    """
+    <style>
+        .st-key-validate-result .stAlertContainer {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 if "calculate_reset_counter" not in state:
     state.calculate_reset_counter: int = 0 # type: ignore
 
@@ -82,18 +95,6 @@ def validate_digit():
             status = verify.validate_rut(
                 digits=int(rut),
                 verifier=digit
-            )
-            
-            st.markdown(
-                """
-                <style>
-                    .st-key-validate-result .stAlertContainer {
-                        padding-top: 0.5rem;
-                        padding-bottom: 0.5rem;
-                    }
-                </style>
-                """,
-                unsafe_allow_html=True,
             )
 
             with st.container(key="validate-result"):
