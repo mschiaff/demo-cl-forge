@@ -5,7 +5,7 @@ from cl_forge import verify
 from streamlit import session_state as state
 
 st.set_page_config(
-    page_title="Cálculo y Validación de RUT",
+    page_title="Cálculo y Validación de Patente",
     page_icon="🔍"
 )
 
@@ -22,24 +22,24 @@ st.markdown(
 )
 
 
-if "calculate_reset_counter" not in state:
-    state.calculate_reset_counter: int = 0 # type: ignore
+if "calculate_ppu_reset_counter" not in state:
+    state.calculate_ppu_reset_counter: int = 0 # type: ignore
 
-if "validate_reset_counter" not in state:
-    state.validate_reset_counter: int = 0 # type: ignore
+if "validate_ppu_reset_counter" not in state:
+    state.validate_ppu_reset_counter: int = 0 # type: ignore
 
 
-def _increment_calculate_reset_counter() -> None:
-    state.calculate_reset_counter += 1
+def _increment_calculate_ppu_reset_counter() -> None:
+    state.calculate_ppu_reset_counter += 1
 
-def _get_calculate_input_key() -> str:
-    return f"calculate_rut_input_{state.calculate_reset_counter}"
+def _get_calculate_ppu_input_key() -> str:
+    return f"calculate_ppu_input_{state.calculate_ppu_reset_counter}"
 
-def _increment_validate_reset_counter() -> None:
-    state.validate_reset_counter += 1
+def _increment_validate_ppu_reset_counter() -> None:
+    state.validate_ppu_reset_counter += 1
 
-def _get_validate_input_key() -> str:
-    return f"validate_rut_input_{state.validate_reset_counter}"
+def _get_validate_ppu_input_key() -> str:
+    return f"validate_ppu_input_{state.validate_ppu_reset_counter}"
 
 
 def calculate_digit():
@@ -49,29 +49,32 @@ def calculate_digit():
     )
 
     with col1:
-        rut = st.text_input(
-            label="Ingrese RUT",
-            placeholder="Ej: 8750720",
-            key=_get_calculate_input_key(),
+        raw_ppu = st.text_input(
+            label="Ingrese Patente",
+            placeholder="Ej: PHZF55",
+            key=_get_calculate_ppu_input_key(),
+        )
+        
+        ppu: verify.Ppu | None = (
+            verify.Ppu(raw_ppu)
+            if raw_ppu else None
         )
 
     with col2:
-        digit = st.text_input(
+        st.text_input(
             label="Dígito Verificador",
-            value=verify.calculate_verifier(
-                int(rut)
-            ) if rut else "",
+            value=ppu.verifier if ppu else "",
             disabled=True,
         )
 
-    if rut and digit:
-        st.code(f"{rut}-{digit}")
+    if ppu:
+        st.code(f"{ppu.normalized}-{ppu.verifier}")
     
     st.button(
         label="Reset",
-        key="calculate_reset",
+        key="calculate_ppu_reset",
         type="primary",
-        on_click=_increment_calculate_reset_counter,
+        on_click=_increment_calculate_ppu_reset_counter,
         use_container_width=True,
     )
 
@@ -83,40 +86,42 @@ def validate_digit():
     )
 
     with col1:
-        rut_digit = st.text_input(
-            label="Ingrese RUT",
-            placeholder="Ej: 8750720-3",
-            key=_get_validate_input_key(),
+        ppu_digit = st.text_input(
+            label="Ingrese Patente",
+            placeholder="Ej: PHZF55-3",
+            key=_get_validate_ppu_input_key(),
+        )
+
+        raw_ppu, raw_digit = (
+            ppu_digit.split("-")
+            if ppu_digit else (None, None)
+        )
+
+        ppu: verify.Ppu | None = (
+            verify.Ppu(raw_ppu)
+            if raw_ppu else None
         )
     
     with col2:
-        rut, digit = (
-            rut_digit.split("-")
-            if rut_digit else (None, None)
-        )
-        
-        if rut and digit:
-            status = verify.validate_rut(
-                digits=int(rut),
-                verifier=digit
-            )
+        if ppu and isinstance(raw_digit, str):
+            status = ppu.verifier == raw_digit.upper()
 
             with st.container(key="validate-result"):
                 if status:
-                    st.success("RUT válido")
+                    st.success("Patente válida")
                 else:
-                    st.error("RUT inválido")
+                    st.error("Patente inválida")
 
     st.button(
         label="Reset",
-        key="validate_reset",
+        key="validate_ppu_reset",
         type="primary",
-        on_click=_increment_validate_reset_counter,
+        on_click=_increment_validate_ppu_reset_counter,
         use_container_width=True,
     )
 
 
-st.title("Cálculo y Validación de RUT")
+st.title("Cálculo y Validación de Patente")
 
 st.subheader("Calcular dígito verificador")
 calculate_digit()
