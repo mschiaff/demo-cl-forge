@@ -67,7 +67,7 @@ def calculate_digit():
             placeholder="Ej: GXSX28",
             key=_get_calculate_ppu_input_key(),
         )
-        
+
         ppu: verify.Ppu | None = (
             verify.Ppu(raw_ppu)
             if raw_ppu else None
