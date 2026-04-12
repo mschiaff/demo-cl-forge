@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import locale
+
 import streamlit as st
-from cl_forge.cmf import IpcEndpoint
+from cl_forge import cmf
 from streamlit import session_state as state
 from streamlit.column_config import DateColumn, NumberColumn
 
@@ -10,6 +12,7 @@ st.set_page_config(
     page_icon="🏦"
 )
 
+locale.setlocale(locale.LC_ALL, "es_ES")
 
 if "cmf_api_key" not in state:
     state.cmf_api_key: str | None = None # type: ignore
@@ -31,29 +34,29 @@ with st.sidebar:
 
 
 if state.cmf_api_key and st.button("Obtener"):
-    ipc = IpcEndpoint(state.cmf_api_key)
+    ipc = cmf.IpcEndpoint(state.cmf_api_key)
     obj = ipc.current()
-    st.dataframe(
+    df_ipc_current = st.dataframe(
         data={
             "Fecha": [obj.date],
             "Valor": [obj.value],
         },
         column_config={
-            "Fecha": DateColumn("Fecha"),
+            "Fecha": DateColumn("Fecha", format="MMMM DD, YYYY"),
             "Valor": NumberColumn("Valor", format="percent"),
         }
     )
 
 if state.cmf_api_key and st.button("Obtener Año"):
-    ipc = IpcEndpoint(state.cmf_api_key)
+    ipc = cmf.IpcEndpoint(state.cmf_api_key)
     obj = ipc.year(2025)
-    st.dataframe(
+    df_ipc_year = st.dataframe(
         data={
             "Fecha": [v.date for v in obj],
             "Valor": [v.value for v in obj],
         },
         column_config={
-            "Fecha": DateColumn("Fecha"),
+            "Fecha": DateColumn("Fecha", format="MMMM DD, YYYY"),
             "Valor": NumberColumn("Valor", format="percent"),
         }
     )
