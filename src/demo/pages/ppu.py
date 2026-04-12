@@ -6,7 +6,7 @@ from cl_forge.exceptions import UnknownFormat
 from streamlit import session_state as state
 
 st.set_page_config(
-    page_title="Cálculo y Validación de Patente",
+    page_title="Validación | Patente",
     page_icon="🔍"
 )
 
