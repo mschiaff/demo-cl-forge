@@ -33,32 +33,91 @@ with st.sidebar:
     )
 
 
-if state.cmf_api_key and st.button("Obtener"):
-    ipc = cmf.IpcEndpoint(state.cmf_api_key)
-    obj = ipc.current()
-    df_ipc_current = st.dataframe(
+st.header("Índice de Precios al Consumidor (IPC)")
+
+
+st.subheader("Valor Actual")
+
+df_ipc_current = st.dataframe( # type: ignore
         data={
-            "Fecha": [obj.date],
-            "Valor": [obj.value],
+            "Fecha": [],
+            "Valor": [],
         },
         column_config={
-            "Fecha": DateColumn("Fecha", format="MMMM DD, YYYY"),
-            "Valor": NumberColumn("Valor", format="percent"),
-        }
+            "Fecha": DateColumn(
+                "Fecha",
+                format="MMMM DD, YYYY"
+            ),
+            "Valor": NumberColumn(
+                "Valor",
+                format="percent"
+            ),
+        },
+        key="ipc_current_df",
     )
 
-if state.cmf_api_key and st.button("Obtener Año"):
-    ipc = cmf.IpcEndpoint(state.cmf_api_key)
-    obj = ipc.year(2025)
-    df_ipc_year = st.dataframe(
+if st.button(label="Consultar", disabled=state.cmf_api_key is None):
+    ipc_current = cmf.IpcEndpoint(
+        state.cmf_api_key # type: ignore
+    ).current()
+    
+    ipc_current_data = {
+        "Fecha": [ipc_current.date],
+        "Valor": [ipc_current.value],
+    }
+    df_ipc_current.add_rows( # type: ignore
+        ipc_current_data
+    )
+
+
+st.number_input(
+    label="Año",
+    min_value=2000,
+    max_value=2026,
+    value=2025,
+    step=1,
+    key="ipc_selected_year",
+)
+
+df_ipc_year = st.dataframe( # type: ignore
         data={
-            "Fecha": [v.date for v in obj],
-            "Valor": [v.value for v in obj],
+            "Fecha": [],
+            "Valor": [],
         },
         column_config={
-            "Fecha": DateColumn("Fecha", format="MMMM DD, YYYY"),
-            "Valor": NumberColumn("Valor", format="percent"),
-        }
+            "Fecha": DateColumn(
+                "Fecha",
+                format="MMMM DD, YYYY"
+            ),
+            "Valor": NumberColumn(
+                "Valor",
+                format="percent"
+            ),
+        },
+        key="ipc_year_df",
     )
+
+ipc_year_container = st.container()
+if st.button("Consultar Año", disabled=state.cmf_api_key is None):
+    ipc_year = cmf.IpcEndpoint(
+        state.cmf_api_key # type: ignore
+    ).year(
+        state.ipc_selected_year
+    )
+    
+    ipc_year_data = {
+        "Fecha": [v.date for v in ipc_year],
+        "Valor": [v.value for v in ipc_year],
+    }
+    df_ipc_year.add_rows( # type: ignore
+        ipc_year_data
+    )
+
+    if df_ipc_year:
+        ipc_year_container.markdown(
+            f"**Total {state.ipc_selected_year}:** "
+            f"{sum(v.value for v in ipc_year):.2%}"
+        )
+
 
 st.write(state)
