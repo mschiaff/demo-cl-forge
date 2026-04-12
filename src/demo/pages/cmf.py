@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import locale
+from typing import Any
 
 import streamlit as st
 from cl_forge import cmf
@@ -12,10 +12,14 @@ st.set_page_config(
     page_icon="🏦"
 )
 
-locale.setlocale(locale.LC_ALL, "es_ES")
+if "cmf_api_key_stored" not in state:
+    state.cmf_api_key_stored: str | None = None # type: ignore
 
-if "cmf_api_key" not in state:
-    state.cmf_api_key: str | None = None # type: ignore
+if "ipc_current_data" not in state:
+    state.ipc_current_data: dict[str, list[Any]] | None = None # type: ignore
+
+if "ipc_year_data" not in state:
+    state.ipc_year_data: dict[str, list[Any]] | None = None # type: ignore
 
 
 with st.sidebar:
@@ -23,13 +27,15 @@ with st.sidebar:
         label="API Key",
         placeholder="Ingrese su API Key de la CMF",
         type="password",
+        value=state.cmf_api_key_stored or "",
+        key="cmf_api_key",
+        on_change=lambda: state.update({"cmf_api_key_stored": state.cmf_api_key}),
         help=(
             "⚠️ No es almacenada ni compartida. Solo "
             "se utiliza para esta sesión, y se borra "
             "al cerrar la aplicación o al recargar "
             "la página."
         ),
-        key="cmf_api_key",
     )
 
 
@@ -38,86 +44,59 @@ st.header("Índice de Precios al Consumidor (IPC)")
 
 st.subheader("Valor Actual")
 
-df_ipc_current = st.dataframe( # type: ignore
-        data={
-            "Fecha": [],
-            "Valor": [],
-        },
-        column_config={
-            "Fecha": DateColumn(
-                "Fecha",
-                format="MMMM DD, YYYY"
-            ),
-            "Valor": NumberColumn(
-                "Valor",
-                format="percent"
-            ),
-        },
-        key="ipc_current_df",
-    )
+if st.button(label="Consultar", disabled=state.cmf_api_key_stored is None):
+    ipc_current = cmf.IpcEndpoint(state.cmf_api_key_stored).current() # type: ignore
 
-if st.button(label="Consultar", disabled=state.cmf_api_key is None):
-    ipc_current = cmf.IpcEndpoint(
-        state.cmf_api_key # type: ignore
-    ).current()
-    
-    ipc_current_data = {
+    state.ipc_current_data = {
         "Fecha": [ipc_current.date],
         "Valor": [ipc_current.value],
     }
-    df_ipc_current.add_rows( # type: ignore
-        ipc_current_data
-    )
 
-
-st.number_input(
-    label="Año",
-    min_value=2000,
-    max_value=2026,
-    value=2025,
-    step=1,
-    key="ipc_selected_year",
+st.dataframe( # type: ignore
+    data=state.ipc_current_data or {"Fecha": [], "Valor": []},
+    column_config={
+        "Fecha": DateColumn("Fecha", format="MMMM DD, YYYY"),
+        "Valor": NumberColumn("Valor", format="percent"),
+    },
 )
 
-df_ipc_year = st.dataframe( # type: ignore
-        data={
-            "Fecha": [],
-            "Valor": [],
-        },
-        column_config={
-            "Fecha": DateColumn(
-                "Fecha",
-                format="MMMM DD, YYYY"
-            ),
-            "Valor": NumberColumn(
-                "Valor",
-                format="percent"
-            ),
-        },
-        key="ipc_year_df",
+
+st.subheader("Año Completo")
+
+with st.container(horizontal=True, vertical_alignment="bottom"):
+    ipc_selected_year = st.number_input(
+        label="Seleccionar Año",
+        min_value=2000,
+        max_value=2026,
+        value=2025,
+        step=1,
+        key="ipc_selected_year",
+        on_change=lambda: state.update({"ipc_year_data": None})
     )
 
-ipc_year_container = st.container()
-if st.button("Consultar Año", disabled=state.cmf_api_key is None):
-    ipc_year = cmf.IpcEndpoint(
-        state.cmf_api_key # type: ignore
-    ).year(
-        state.ipc_selected_year
-    )
-    
-    ipc_year_data = {
-        "Fecha": [v.date for v in ipc_year],
-        "Valor": [v.value for v in ipc_year],
-    }
-    df_ipc_year.add_rows( # type: ignore
-        ipc_year_data
-    )
+    if st.button("Consultar Año", disabled=state.cmf_api_key_stored is None):
+        ipc_year = cmf.IpcEndpoint(state.cmf_api_key_stored).year(state.ipc_selected_year) # type: ignore
 
-    if df_ipc_year:
-        ipc_year_container.markdown(
-            f"**Total {state.ipc_selected_year}:** "
-            f"{sum(v.value for v in ipc_year):.2%}"
-        )
+        state.ipc_year_data = {
+            "Fecha": [v.date for v in ipc_year] if ipc_year else [],
+            "Valor": [v.value for v in ipc_year] if ipc_year else [],
+        }
+
+st.dataframe( # type: ignore
+    data=state.ipc_year_data or {"Fecha": [], "Valor": []},
+    column_config={
+        "Fecha": DateColumn("Fecha", format="MMMM DD, YYYY"),
+        "Valor": NumberColumn("Valor", format="percent"),
+    },
+)
+
+if state.ipc_year_data:
+    st.markdown(
+        f"**Total {state.ipc_selected_year}:** "
+        f"{sum(state.ipc_year_data['Valor']):.2%}\n\n"
+        f"**Promedio {state.ipc_selected_year}:** "
+        f"{sum(state.ipc_year_data['Valor']) / len(state.ipc_year_data['Valor']):.2%}"
+    )
 
 
 st.write(state)
