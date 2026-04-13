@@ -46,8 +46,8 @@ The app is organized into sections that showcase different parts of the library:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mschiaff/streamlit-cl-forge.git
-cd streamlit-cl-forge
+git clone https://github.com/mschiaff/demo-cl-forge.git
+cd demo-cl-forge
 
 # Install dependencies
 uv sync
