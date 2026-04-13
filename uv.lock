@@ -242,18 +242,20 @@ wheels = [
 
 [[package]]
 name = "cl-forge"
-version = "1.0.1"
+version = "1.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "orjson" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9d/fd/c8587cbe0b709bbea11231136ff3a8a50a4b6b3e42017bf0a0df0b46964a/cl_forge-1.0.1.tar.gz", hash = "sha256:774a90aa497c9357900d307d6d19e4dbe2ac89adfdcc524af567e55e6a71edd1", size = 45643, upload-time = "2026-02-16T17:43:51.31Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/66/4c/d93007c5424f94b9b054a95887e85f86c62828f123b8c6618c83ca938a76/cl_forge-1.0.2.tar.gz", hash = "sha256:4d6421ad13aae5dedae5eef0e590d01267380b12dfe0b3a8654e490b19bfbf90", size = 47990, upload-time = "2026-04-13T23:43:47.993Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/f6/c7bbf15fd93290faf087abd08d17bc0b8fc489d816874e85a26aabc02b14/cl_forge-1.0.1-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:a9de6fa604621f6057bedcddbebd5bdf62f3f51a08ef0d1a33a0eacd25f299d5", size = 3139609, upload-time = "2026-02-16T17:44:14.796Z" },
-    { url = "https://files.pythonhosted.org/packages/e6/1d/4acf55c7d30c0a93950a8188fa7666bf16f80c1440f340518af3d1855e08/cl_forge-1.0.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:64d10e1594b02602cd9ec5b906011b8d14c46fbfe311d11f5bc89f3f0d186f28", size = 3028713, upload-time = "2026-02-16T17:44:04.857Z" },
-    { url = "https://files.pythonhosted.org/packages/85/04/26cad37dbf54d23c6ae76c6567a1879b512dcd83bd7a5a20ac5cabe5bcfa/cl_forge-1.0.1-cp313-cp313-win_amd64.whl", hash = "sha256:404397356248af9b6ebb67efd58e30fa928aab8932e7d57bc0727c215fbcb3b8", size = 2523397, upload-time = "2026-02-16T17:44:07.744Z" },
-    { url = "https://files.pythonhosted.org/packages/6a/ce/88e744584f5e33fb6f80c65c21136d5eb3cc04608d014f91450e55bb37f9/cl_forge-1.0.1-cp313-cp313-win_arm64.whl", hash = "sha256:bf69a3114e748199be59925af9852082feb9fbb217e24bda0be7d59210a34c14", size = 2609843, upload-time = "2026-02-16T17:44:00.635Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/5f/05944192144032da50c9fe413764149c0bd43d7a5b6ea2531d9a4f0be551/cl_forge-1.0.2-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:0b096e492ffbabc4434d725761942b3539782b8056fa4b4683a0aa66df6a7467", size = 3123288, upload-time = "2026-04-13T23:43:34.204Z" },
+    { url = "https://files.pythonhosted.org/packages/87/3d/5fda5635a3b7e72f95ca1654c82fff5795665f00f406c1caad51b6d05640/cl_forge-1.0.2-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:f57bcfc787f72cc593deeb49aa53a113cffb410f0f0307d18f703e1bffb37811", size = 3013907, upload-time = "2026-04-13T23:43:45.282Z" },
+    { url = "https://files.pythonhosted.org/packages/73/63/73db119a7c41c898c6c9c41b875db37827cb9ae27a136b1636b220bc02cc/cl_forge-1.0.2-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:333eb6a758436b6f5eefbcf3da2b96562a766ab6a0faa31e71cd44670db4bac4", size = 3146933, upload-time = "2026-04-13T23:43:38.349Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/1a/d18fdab7de18793e615ada271bc54e4ddb95e7d0634ba2babc094c122bb1/cl_forge-1.0.2-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9c0879d2b2b03dae0b82ac64e4390bb0520487785880c1ab42fd11a6924d9c4d", size = 3237933, upload-time = "2026-04-13T23:43:51.86Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/e4/6a0a287b16dd6369e74aedda5feaa86fca9ef53f9c4ba2908c7751fcf2f7/cl_forge-1.0.2-cp313-cp313-win_amd64.whl", hash = "sha256:8c75671ffad5b085d74a13de5950a8740f4dd39f28b3801fddc2234b1b843157", size = 2516507, upload-time = "2026-04-13T23:43:37.141Z" },
+    { url = "https://files.pythonhosted.org/packages/82/bf/c7ef184b5b3ed0acf51dcf4057944d7964378267f6798b6543ec06bff2b7/cl_forge-1.0.2-cp313-cp313-win_arm64.whl", hash = "sha256:7436edca37278b4a926588af76b402a17ac4579a3379791e1a6fd1ba3e998284", size = 2610155, upload-time = "2026-04-13T23:43:30.143Z" },
 ]
 
 [[package]]
@@ -320,7 +322,7 @@ wheels = [
 [[package]]
 name = "demo-cl-forge"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "cl-forge" },
     { name = "streamlit" },
@@ -338,7 +340,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cl-forge", specifier = ">=1.0.1,<2.0.0" },
+    { name = "cl-forge", specifier = ">=1.0.2,<2.0.0" },
     { name = "streamlit", specifier = ">=1.56.0,<2.0.0" },
     { name = "watchdog", specifier = ">=6.0.0" },
 ]
