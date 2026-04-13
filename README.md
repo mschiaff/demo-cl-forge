@@ -2,7 +2,7 @@
 
 > Interactive web app showcasing [**CL Forge**](https://github.com/mschiaff/cl-forge) — high-performance Chilean data tools written in Rust & Python.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://demo-cl-forge.streamlit.app)
 [![cl-forge](https://img.shields.io/pypi/v/cl-forge?label=cl-forge&color=blue)](https://pypi.org/project/cl-forge/)
 [![Python](https://img.shields.io/badge/python-≥3.13-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
@@ -17,7 +17,7 @@ The goal of this demo is to let you **interact** with the library's features dir
 
 ## Live Demo
 
-👉 **[Open the app](https://your-app.streamlit.app)** — hosted on Streamlit Community Cloud.
+👉 **[Open the app](https://demo-cl-forge.streamlit.app)** — hosted on Streamlit Community Cloud.
 
 No setup needed. Just open the link and start exploring.
 
