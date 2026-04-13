@@ -318,6 +318,41 @@ wheels = [
 ]
 
 [[package]]
+name = "demo-cl-forge"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "cl-forge" },
+    { name = "streamlit" },
+    { name = "watchdog" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ipykernel" },
+    { name = "ipywidgets" },
+    { name = "notebook" },
+    { name = "pyright" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "cl-forge", specifier = ">=1.0.1,<2.0.0" },
+    { name = "streamlit", specifier = ">=1.56.0,<2.0.0" },
+    { name = "watchdog", specifier = ">=6.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ipykernel", specifier = ">=7.2.0,<8.0.0" },
+    { name = "ipywidgets", specifier = ">=8.1.8,<9.0.0" },
+    { name = "notebook", specifier = ">=7.5.5,<8.0.0" },
+    { name = "pyright", specifier = ">=1.1.408,<2.0.0" },
+    { name = "ruff", specifier = ">=0.15.8,<1.0.0" },
+]
+
+[[package]]
 name = "executing"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1549,41 +1584,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/03/85/7c669b3a1336d34ef39fa9760fbd343185f3b15db2ad0838fd78423d1c7f/streamlit-1.56.0.tar.gz", hash = "sha256:1176acfa89ae1318b79078e8efe689a9d02e8d58e325c00fc0e55fa2f3fe8d6a", size = 8559239, upload-time = "2026-03-31T22:29:38.59Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e4/91/cb6f13a89e376ef179309d74f37a70ea0041d5e4b5ba5c4836dbf6e020ad/streamlit-1.56.0-py3-none-any.whl", hash = "sha256:8677a335734a30a51bc57ad0ec910e365d95f7c456fc02c60032927cd0729dc5", size = 9052089, upload-time = "2026-03-31T22:29:36.342Z" },
-]
-
-[[package]]
-name = "streamlit-cl-forge"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "cl-forge" },
-    { name = "streamlit" },
-    { name = "watchdog" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "ipykernel" },
-    { name = "ipywidgets" },
-    { name = "notebook" },
-    { name = "pyright" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cl-forge", specifier = ">=1.0.1,<2.0.0" },
-    { name = "streamlit", specifier = ">=1.56.0,<2.0.0" },
-    { name = "watchdog", specifier = ">=6.0.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "ipykernel", specifier = ">=7.2.0,<8.0.0" },
-    { name = "ipywidgets", specifier = ">=8.1.8,<9.0.0" },
-    { name = "notebook", specifier = ">=7.5.5,<8.0.0" },
-    { name = "pyright", specifier = ">=1.1.408,<2.0.0" },
-    { name = "ruff", specifier = ">=0.15.8,<1.0.0" },
 ]
 
 [[package]]
