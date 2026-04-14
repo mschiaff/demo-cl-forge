@@ -50,6 +50,13 @@ if "market_api_key_stored" not in state:
     state.market_api_key_stored: str = "" # type: ignore
 
 
+def _is_concurrent_request_error(error: BadStatus) -> bool:
+    """Check if the error is a concurrent requests error (status 500, code 10500)."""
+    return bool(
+        error.args and 'Unexpected status 500: {"Codigo":10500' in error.args[0]
+    )
+
+
 def _set_token() -> None:
     api_key = state.market_api_key
     
@@ -60,10 +67,16 @@ def _set_token() -> None:
             state.market_api_key_stored = api_key
         else:
             state.market_api_key_stored = ""
-    except BadStatus:
-        st.toast("❌ API Key inválida")
-        state.market_api_key = ""
-        state.market_api_key_stored = ""
+    except BadStatus as error:
+        if _is_concurrent_request_error(error):
+            st.toast(
+                "⚠️ Existen peticiones simultáneas con la API Key "
+                "de prueba. Intente nuevamente."
+            )
+        else:
+            st.toast("❌ API Key inválida")
+            state.market_api_key = ""
+            state.market_api_key_stored = ""
 
 
 with st.sidebar:
@@ -107,9 +120,18 @@ with st.container(horizontal=True, vertical_alignment="bottom"):
             disabled=not state.market_api_key_stored,
             key="tenders_latest_button"
     ):
-        tenders_latest = market.MarketClient(state.market_api_key_stored).get("/licitaciones")
-        state.tenders_latest_data = tenders_latest.get("Listado", [DEFAULT_TENDER_DATA])
-        state.tenders_latest_data.sort(key=lambda x: x.get("FechaCierre") or "", reverse=True) # type: ignore
+        try:
+            tenders_latest = market.MarketClient(state.market_api_key_stored).get("/licitaciones")
+            state.tenders_latest_data = tenders_latest.get("Listado", [DEFAULT_TENDER_DATA])
+            state.tenders_latest_data.sort(key=lambda x: x.get("FechaCierre") or "", reverse=True) # type: ignore
+        except BadStatus as error:
+            if _is_concurrent_request_error(error):
+                st.toast(
+                    "⚠️ Existen peticiones simultáneas con la API Key "
+                    "de prueba. Intente nuevamente."
+                )
+            else:
+                st.toast(f"❌ {error}")
     
     if st.button(label="Reset", type="primary", key="tenders_latest_reset"):
         state.tenders_latest_data = [DEFAULT_TENDER_DATA]
@@ -146,8 +168,14 @@ with st.container(horizontal=True, vertical_alignment="bottom", key="tender-deta
                     params={"codigo": tender_code}
                 )
                 state.tender_detail_data = tender_detail.get("Listado", [])[0] # type: ignore
-            except BadStatus:
-                st.error("Licitación no encontrada.")
+            except BadStatus as error:
+                if _is_concurrent_request_error(error):
+                    st.toast(
+                        "⚠️ Existen peticiones simultáneas con la API Key "
+                        "de prueba. Intente nuevamente."
+                    )
+                else:
+                    st.toast(f"❌ {error}")
 
     if st.button(label="Reset", type="primary", key="tender_detail_reset"):
         state.tender_detail_data = {}
