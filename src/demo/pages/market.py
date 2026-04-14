@@ -49,6 +49,9 @@ if "tender_detail_data" not in state:
 if "market_api_key_stored" not in state:
     state.market_api_key_stored: str = "" # type: ignore
 
+if "market_client" not in state:
+    state.market_client: market.MarketClient | None = None # type: ignore
+
 
 def _is_concurrent_request_error(error: BadStatus) -> bool:
     """Check if the error is a concurrent requests error (status 500, code 10500)."""
@@ -60,23 +63,31 @@ def _is_concurrent_request_error(error: BadStatus) -> bool:
 def _set_token() -> None:
     api_key = state.market_api_key
     
+    if not api_key:
+        state.market_api_key_stored = ""
+        state.market_client = None
+        return
+
     try:
-        if api_key:
-            market.MarketClient(api_key).get("/licitaciones")
-            st.toast("✅ API Key válida")
-            state.market_api_key_stored = api_key
-        else:
-            state.market_api_key_stored = ""
+        client = market.MarketClient(api_key)
+        client.get("/licitaciones")
+        st.toast("✅ API Key válida")
+        state.market_api_key_stored = api_key
+        state.market_client = client
     except BadStatus as error:
         if _is_concurrent_request_error(error):
             st.toast(
                 "⚠️ Existen peticiones simultáneas con la API Key "
                 "de prueba. Intente nuevamente."
             )
+            state.market_api_key = ""
+            state.market_api_key_stored = ""
+            state.market_client = None
         else:
             st.toast("❌ API Key inválida")
             state.market_api_key = ""
             state.market_api_key_stored = ""
+            state.market_client = None
 
 
 with st.sidebar:
@@ -121,7 +132,7 @@ with st.container(horizontal=True, vertical_alignment="bottom"):
             key="tenders_latest_button"
     ):
         try:
-            tenders_latest = market.MarketClient(state.market_api_key_stored).get("/licitaciones")
+            tenders_latest = state.market_client.get("/licitaciones") # type: ignore
             state.tenders_latest_data = tenders_latest.get("Listado", [DEFAULT_TENDER_DATA])
             state.tenders_latest_data.sort(key=lambda x: x.get("FechaCierre") or "", reverse=True) # type: ignore
         except BadStatus as error:
@@ -163,7 +174,7 @@ with st.container(horizontal=True, vertical_alignment="bottom", key="tender-deta
             st.warning("Ingrese un código externo.")
         else:
             try:
-                tender_detail = market.MarketClient(state.market_api_key_stored).get( # type: ignore
+                tender_detail = state.market_client.get( # type: ignore
                     "/licitaciones",
                     params={"codigo": tender_code}
                 )
