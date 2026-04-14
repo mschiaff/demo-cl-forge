@@ -127,10 +127,6 @@ def validate_digit():
             )
             raw_ppu, raw_digit = ppu_digit, None
         else:
-            st.toast(
-                "Ingrese una patente para validar",
-                icon="⚠️"
-            )
             raw_ppu, raw_digit = None, None
 
         try:
