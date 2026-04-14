@@ -52,11 +52,17 @@ cd demo-cl-forge
 # Install dependencies
 uv sync
 
-# Run the app (recommended)
-uv run streamlit run src/demo/app.py
+# Run the app
+demo run
 
-# Alternative (if not using uv)
-python -m streamlit run src/demo/app.py
+# Run using uv instead of python -m
+demo run --uv
+
+# Run in detached mode (background)
+demo run --detach
+
+# Stop a detached app
+demo stop
 ```
 
 The app will open in your browser at `http://localhost:8501`.
