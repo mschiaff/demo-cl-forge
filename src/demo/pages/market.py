@@ -105,7 +105,7 @@ with st.container(horizontal=True, vertical_alignment="bottom"):
     ):
         tenders_latest = market.MarketClient(state.market_api_key_stored).get("/licitaciones")
         state.tenders_latest_data = tenders_latest.get("Listado", [DEFAULT_TENDER_DATA])
-        state.tenders_latest_data.sort(key=lambda x: x.get("FechaCierre"), reverse=True) # type: ignore
+        state.tenders_latest_data.sort(key=lambda x: x.get("FechaCierre") or "", reverse=True) # type: ignore
     
     if st.button(label="Reset", type="primary", key="tenders_latest_reset"):
         state.tenders_latest_data = [DEFAULT_TENDER_DATA]
