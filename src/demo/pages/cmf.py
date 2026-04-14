@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING, TypedDict, cast
 
 import streamlit as st
 from cl_forge import cmf
 from cl_forge.exceptions import BadStatus
-from cl_forge.settings import Token
 from streamlit import session_state as state
 from streamlit.column_config import DateColumn, NumberColumn
 
@@ -34,8 +32,8 @@ if "ipc_current_data" not in state:
 if "ipc_year_data" not in state:
     state.ipc_year_data: IpcData = DEFAULT_IPC_DATA # type: ignore
 
-
-token = Token()
+if "cmf_api_key_stored" not in state:
+    state.cmf_api_key_stored: str = "" # type: ignore
 
 
 def avg(values: list[float]) -> float:
@@ -43,16 +41,18 @@ def avg(values: list[float]) -> float:
 
 def _set_token() -> None:
     api_key = state.cmf_api_key
-    os.environ["CLFORGE_CMF_TOKEN"] = api_key
     
     try:
         if api_key:
             cmf.IpcEndpoint(api_key).current()
             st.toast("✅ API Key válida")
+            state.cmf_api_key_stored = api_key
+        else:
+            state.cmf_api_key_stored = ""
     except BadStatus:
         st.toast("❌ API Key inválida")
         state.cmf_api_key = ""
-        os.environ.pop("CLFORGE_CMF_TOKEN", None)
+        state.cmf_api_key_stored = ""
 
 
 with st.sidebar:
@@ -60,7 +60,7 @@ with st.sidebar:
         label="API Key",
         placeholder="Ingrese su API Key de la CMF",
         type="password",
-        value=token.cmf or "",
+        value=state.cmf_api_key_stored,
         key="cmf_api_key",
         on_change=_set_token,
         help=(
@@ -74,7 +74,7 @@ with st.sidebar:
 
 st.header("Índice de Precios al Consumidor (IPC)")
 
-if not token.cmf:
+if not state.cmf_api_key_stored:
     st.warning(
         "Por favor, ingrese su API Key de la CMF "
         "en la barra lateral para consultar datos."
@@ -84,8 +84,12 @@ if not token.cmf:
 st.subheader("Valor Actual", help="Último valor disponible del IPC publicado por la CMF")
 
 with st.container(horizontal=True, vertical_alignment="bottom"):
-    if st.button(label="Consultar", disabled=not token.cmf, key="ipc_current_button"):
-        ipc_current = cmf.IpcEndpoint(token.cmf).current() # type: ignore
+    if st.button(
+            label="Consultar",
+            disabled=not state.cmf_api_key_stored,
+            key="ipc_current_button"
+    ):
+        ipc_current = cmf.IpcEndpoint(state.cmf_api_key_stored).current()
 
         state.ipc_current_data = {
             "Fecha": [ipc_current.date],
@@ -120,8 +124,8 @@ with st.container(horizontal=True, vertical_alignment="bottom"):
         )
     )
 
-    if st.button("Consultar", disabled=not token.cmf, key="ipc_year_button"):
-        ipc_year = cmf.IpcEndpoint(token.cmf).year(state.ipc_selected_year) # type: ignore
+    if st.button("Consultar", disabled=not state.cmf_api_key_stored, key="ipc_year_button"):
+        ipc_year = cmf.IpcEndpoint(state.cmf_api_key_stored).year(state.ipc_selected_year) # type: ignore
 
         state.ipc_year_data: IpcData = { # type: ignore
             "Fecha": [v.date for v in ipc_year] if ipc_year else [],

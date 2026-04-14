@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import os
 from typing import Any, TypedDict
 
 import streamlit as st
 from cl_forge import market
 from cl_forge.exceptions import BadStatus
-from cl_forge.settings import Token
 from streamlit import session_state as state
 
 DEFAULT_TENDER_DATA: TenderData = {
@@ -48,22 +46,24 @@ if "tenders_latest_data" not in state:
 if "tender_detail_data" not in state:
     state.tender_detail_data: dict[str, Any] = {} # type: ignore
 
-
-token = Token()
+if "market_api_key_stored" not in state:
+    state.market_api_key_stored: str = "" # type: ignore
 
 
 def _set_token() -> None:
     api_key = state.market_api_key
-    os.environ["CLFORGE_MARKET_TOKEN"] = api_key
     
     try:
         if api_key:
             market.MarketClient(api_key).get("/licitaciones")
             st.toast("✅ API Key válida")
+            state.market_api_key_stored = api_key
+        else:
+            state.market_api_key_stored = ""
     except BadStatus:
         st.toast("❌ API Key inválida")
         state.market_api_key = ""
-        os.environ.pop("CLFORGE_MARKET_TOKEN", None)
+        state.market_api_key_stored = ""
 
 
 with st.sidebar:
@@ -71,7 +71,7 @@ with st.sidebar:
         label="API Key",
         placeholder="Ingrese su API Key de Mercado Público",
         type="password",
-        value=token.market or "",
+        value=state.market_api_key_stored,
         key="market_api_key",
         on_change=_set_token,
         help=(
@@ -85,7 +85,7 @@ with st.sidebar:
 
 st.header("Licitaciones de Mercado Público")
 
-if not token.market:
+if not state.market_api_key_stored:
     st.warning(
         "Por favor, ingrese su API Key de Mercado Público "
         "en la barra lateral para consultar datos."
@@ -98,8 +98,12 @@ st.subheader(
 )
 
 with st.container(horizontal=True, vertical_alignment="bottom"):
-    if st.button(label="Consultar", disabled=not token.market, key="tenders_latest_button"):
-        tenders_latest = market.MarketClient(token.market).get("/licitaciones") # type: ignore
+    if st.button(
+            label="Consultar",
+            disabled=not state.market_api_key_stored,
+            key="tenders_latest_button"
+    ):
+        tenders_latest = market.MarketClient(state.market_api_key_stored).get("/licitaciones")
         state.tenders_latest_data = tenders_latest.get("Listado", [DEFAULT_TENDER_DATA])
         state.tenders_latest_data.sort(key=lambda x: x.get("FechaCierre"), reverse=True) # type: ignore
     
@@ -124,12 +128,16 @@ with st.container(horizontal=True, vertical_alignment="bottom", key="tender-deta
         key="tender_detail_code"
     )
 
-    if st.button(label="Consultar", disabled=not token.market, key="tender_detail_button"):
+    if st.button(
+            label="Consultar",
+            disabled=not state.market_api_key_stored,
+            key="tender_detail_button"
+    ):
         if not tender_code:
             st.warning("Ingrese un código externo.")
         else:
             try:
-                tender_detail = market.MarketClient(token.market).get( # type: ignore
+                tender_detail = market.MarketClient(state.market_api_key_stored).get( # type: ignore
                     "/licitaciones",
                     params={"codigo": tender_code}
                 )
