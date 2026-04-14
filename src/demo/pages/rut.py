@@ -55,6 +55,14 @@ def calculate_digit():
             key=_get_calculate_input_key(),
         )
 
+        rut = rut.strip().replace(".", "").replace("-", "") if rut else None
+
+        try:
+            rut = int(rut) if rut else None
+        except ValueError:
+            st.toast("El RUT debe contener solo números", icon="⚠️")
+            rut = None
+
     with col2:
         digit = st.text_input(
             label="Dígito Verificador",
@@ -91,19 +99,35 @@ def validate_digit():
     
     with col2:
         rut, digit = (
-            rut_digit.split("-")
+            rut_digit.split("-", maxsplit=1)
             if rut_digit else (None, None)
         )
         
+        rut = rut.strip().replace(".", "") if rut else None
+        digit = digit.strip() if digit else None
+        
         if rut and digit:
-            status = verify.validate_rut(
-                digits=int(rut),
-                verifier=digit
+            try:
+                rut = int(rut)
+            except ValueError:
+                st.toast(
+                    "El RUT debe contener solo números y guión "
+                    "para separar el dígito verificador",
+                    icon="⚠️"
+                )
+                rut = None
+                digit = None
+
+            status = (
+                verify.validate_rut(digits=rut, verifier=digit)
+                if rut and digit else None
             )
 
             with st.container(key="validate-result"):
                 if status:
                     st.success("RUT válido")
+                elif status is None:
+                    pass
                 else:
                     st.error("RUT inválido")
 

@@ -68,10 +68,14 @@ def calculate_digit():
             key=_get_calculate_ppu_input_key(),
         )
 
-        ppu: verify.Ppu | None = (
-            verify.Ppu(raw_ppu)
-            if raw_ppu else None
-        )
+        try:
+            ppu: verify.Ppu | None = (
+                verify.Ppu(raw_ppu)
+                if raw_ppu else None
+            )
+        except UnknownFormat:
+            st.toast("Formato de patente inválido", icon="⚠️")
+            ppu = None
 
     with col2:
         st.text_input(
@@ -116,8 +120,17 @@ def validate_digit():
         if ppu_digit and "-" in ppu_digit:
             raw_ppu, raw_digit = ppu_digit.split("-", 1)
         elif ppu_digit:
+            st.toast(
+                "El formato debe incluir un guión separando "
+                "la patente del dígito verificador",
+                icon="⚠️"
+            )
             raw_ppu, raw_digit = ppu_digit, None
         else:
+            st.toast(
+                "Ingrese una patente para validar",
+                icon="⚠️"
+            )
             raw_ppu, raw_digit = None, None
 
         try:
