@@ -77,7 +77,9 @@ st.header("Índice de Precios al Consumidor (IPC)")
 if not state.cmf_api_key_stored:
     st.warning(
         "Por favor, ingrese su API Key de la CMF "
-        "en la barra lateral para consultar datos."
+        "en la barra lateral para consultar datos. "
+        "Si no tienes una, puedes obtenerla gratis solicitándola aquí 👉 "
+        "[Solicitar API Key](https://api.cmfchile.cl/api_cmf/contactanos.jsp)."
     )
 
 

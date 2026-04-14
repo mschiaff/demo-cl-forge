@@ -88,8 +88,12 @@ st.header("Licitaciones de Mercado Público")
 if not state.market_api_key_stored:
     st.warning(
         "Por favor, ingrese su API Key de Mercado Público "
-        "en la barra lateral para consultar datos."
+        "en la barra lateral para consultar datos. "
+        "Si no tienes una, puedes obtenerla gratis solicitándola aquí 👉 "
+        "[Solicitar API Key](https://api.mercadopublico.cl/modules/IniciarSesion.aspx).\n\n"
+        "También puedes usar la API Key de prueba de Mercado Público 👇"
     )
+    st.code('F8537A18-6766-4DEF-9E59-426B4FEE2844')
 
 
 st.subheader(
